@@ -15,150 +15,60 @@
 [4]: https://github.com/liudf0716/apfree_wifidog/pulls
 [5]: https://img.shields.io/badge/Issues-welcome-brightgreen.svg?style=plastic
 [6]: https://github.com/liudf0716/apfree_wifidog/issues/new
-[7]: https://img.shields.io/badge/release-3.11.1716-red.svg?style=plastic
+[7]: https://img.shields.io/badge/release-2.10.1437-red.svg?style=plastic
 [8]: https://github.com/liudf0716/apfree_wifidog/releases
 [11]: https://img.shields.io/badge/Platform-%20OpenWRT%7C%20LEDE%20-brightgreen.svg?style=plastic
-[12]: https://github.com/KunTengRom/kunteng-lede-17.01.4
+[12]: https://github.com/KunTengRom/LEDE
 [13]: https://img.shields.io/badge/KunTeng-Inside-blue.svg?style=plastic
-[14]: http://rom.kunteng.org.cn
-[15]: https://travis-ci.org/liudf0716/apfree_wifidog.svg?branch=master
-[16]: https://travis-ci.org/liudf0716/apfree_wifidog
+[14]: http://rom.kunteng.org
 
-## Apfree WiFiDog: More efficient captive portal solution 
+## About ApFree WiFiDog
+ApFree WiFiDog 在完全兼容原版WiFiDog的基础上，在功能、性能和稳定性方面做了大量工作、改进及优化。
 
-Apfree-WiFidog is an open source captive portal solution for wireless router which with embeddable Linux([LEDE](https://github.com/lede-project/source)/[Openwrt](https://github.com/openwrt/openwrt)). 
+由于ApFree WiFiDog完全兼容原有的WiFiDog协议，在将原有WiFiDog迁移到ApFree WiFiDog可以做到无缝切换
 
+## ApFree WiFiDog的优势
 
-**[中文介绍](https://github.com/liudf0716/apfree_wifidog/blob/master/README_ZH.md)**
+ 1，稳定， 大规模在商业场景下应用，稳定性得到实际场景下的检验，支持主流认证：包括微信连，短信等认证方式
+ 
+ 2，持续更新维护，由坤腾固件研发测试团队维护，保障其功能持续迭代，紧跟用户场景的需求
+ 
+ 3，性能优异 用time curl 命令测试， http的响应时间是0.05s左右, https的响应时间是0.2s左右，用户真实的体验是秒开
+ 
+ 4，支持https请求跳转
+ 
+## ApFree WiFiDog认证服务器
 
-## Enhancement of apfree-wifidog 
+官方认证服务器是[WWAS](https://github.com/wificoin-project/wificoin-wifidog-auth-server)， 当前支持支付WFCS上网，微信连认证上网方式，后期将完善补充短信认证上网方式
 
-In fact, the title should be why we choose apfree-wifidog, the reason was the following: 
+## HTTPS请求跳转演示视频
 
->  Stable
+http://v.qq.com/x/page/f03507zyfvv.html
 
-apfree-wifidog was widely used in tens of thousands device, which were running in business scene. In order to improve its stable, we rewrite all iptables rule by api instead of fork call, which will easily cause deadlock in multithread-fork running environment
-
-> Efficent
-
-apfree-wifidog's http request-response is more quick, u can find statistic data in our test document
-
-> More features
-
-apfree-wifidog support https redirect, mac temporary-pass, ip,domain,pan-domain,white-mac,black-mac rule and etc. all these rules can be applied without restarting wifidog
-
-> Compitable with wifidog authentication server
-
-u don't need to modify your wifidog authentication server to adapt apfree-wifidog
-
-----
-
-## How to added apfree-wifidog into Openwrt package 
-
-```
-cd your_openwrt_sdk_dir
-mkdir -p packages/net/apfree-wifidog
-cp -r apfree_wifidog_openwrt/* packages/net/apfree-wifidog
-make menuconfig
-select apfree-wifidog
-```
-
-Please go to [package_apfree_wifidog]()https://github.com/KunTengRom/package_apfree_wifidog
+## [如何集成到LEDE&Openwrt中](https://github.com/KunTengRom/package_apfree_wifidog)
 
 
---------
+## [功能说明](https://github.com/liudf0716/apfree_wifidog/edit/master/doc/%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E.md)
 
-## Getting started
-
-before starting apfree-wifidog, we must know how to configure it. apfree-wifidog use OpenWrt standard uci config system, all your apfree-wifidog configure information stored in `/etc/confg/wifidogx`, which will be parsed by  `/etc/init.d/wifidogx` to /tmp/wifidog.conf, apfree-wifidog's real configure file is `/tmp/wifidog.conf`
-
-The default apfree-wifidog UCI configuration file like this:
-
-```
-config wifidog
-    option  gateway_interface   'br-lan'
-    option  auth_server_hostname    'wifidog.kunteng.org.cn'
-    option  auth_server_port    443
-    option  auth_server_path    '/wifidog/'
-    option  check_interval      60
-    option  client_timeout      5
-    option  apple_cna           1
-    option  thread_number       5
-    option  wired_passed        0
-    option  enable      0
-```
-
-> auth_server_hostname was apfree-wifidog auth server, it can be domain or ip; wifidog.kunteng.org.cn is a free auth server we provided, it was also [open source](https://github.com/wificoin-project/wwas) 
-
-> apple_cna 1 apple captive detect deceive; 2 apple captive detect deceive to  disallow portal page appear
-
-> wired_passed means whether LAN access devices need to auth or not, value 1 means no need to auth 
-
-> enable means whether start apfree-wifidog when we executed `/etc/init.d/wifidogx start`, if u wanted to start apfree-wifidog, you must set enable to 1 before executing `/etc/init.d/wifidogx start`
-
-### How to support https redirect
-
-In order to support https redirect, apfree-wifidog need x509 pem cert and private key, u can generate youself like this:
-
-```
-PX5G_BIN="/usr/sbin/px5g"
-OPENSSL_BIN="/usr/bin/openssl"
-APFREE_CERT="/etc/apfree.crt"
-APFREE_KEY="/etc/apfree.key"
-
-generate_keys() {
-    local days bits country state location commonname
-
-    # Prefer px5g for certificate generation (existence evaluated last)
-    local GENKEY_CMD=""
-    local UNIQUEID=$(dd if=/dev/urandom bs=1 count=4 | hexdump -e '1/1 "%02x"')
-    [ -x "$OPENSSL_BIN" ] && GENKEY_CMD="$OPENSSL_BIN req -x509 -sha256 -outform pem -nodes"
-    [ -x "$PX5G_BIN" ] && GENKEY_CMD="$PX5G_BIN selfsigned -pem"
-    [ -n "$GENKEY_CMD" ] && {
-        $GENKEY_CMD \
-            -days ${days:-730} -newkey rsa:${bits:-2048} -keyout "${APFREE_KEY}.new" -out "${APFREE_CERT}.new" \
-            -subj /C="${country:-CN}"/ST="${state:-localhost}"/L="${location:-Unknown}"/O="${commonname:-ApFreeWiFidog}$UNIQUEID"/CN="${commonname:-ApFreeWiFidog}"
-        sync
-        mv "${APFREE_KEY}.new" "${APFREE_KEY}"
-        mv "${APFREE_CERT}.new" "${APFREE_CERT}"
-    }
-}
-
-```
-
-or when u start `/etc/init.d/wifidogx start`, it will generate it automatically
-
-### Attention! when apfree-wifidog redirect https request, u will receive certificate file is illegal warning, no need to panic, it's normal response
-
-### apfree-wifidog Auth server open source project
-
-apfree wifidog's official auth server is [wwas](https://github.com/wificoin-project/wificoin-wifidog-auth-server), which support wfc pay and weixin auth-mode and more auth-way will be support.
-
-### demo pic
-
-<img src="https://github.com/wificoin-project/wwas/blob/master/portal.jpg" width="365" height="619"/> <img src="https://github.com/wificoin-project/wwas/blob/master/sms.jpg" width="365" height="619"/>
-
-### demo video
-
-http://www.iqiyi.com/w_19s09zie6t.html
-
-**More auth server please read [AUTHSERVER.md](https://github.com/liudf0716/apfree_wifidog/blob/master/AUTHSERVER.md)**
-
-
-### How To Contribute
-
-Feel free to create issues or pull-requests if you have any problems.
-
-**Please read [CONTRIBUTING.md](https://github.com/liudf0716/apfree_wifidog/blob/master/CONTRIBUTING.md) before pushing any changes.**
-
-
-### contact us 
-
-QQ group： [331230369](https://jq.qq.com/?_wv=1027&k=4ADDSev)
-telegram:  [apfreewifidog](https://t.me/joinchat/H6i5BEY5fUyltcVah1WlNg)
-
-## donate
-### wfc: [weiKbu9DYg26gH2zucSHJHgH5KsuuZd3wW](https://wfc.xyblock.net/#/wifiPortal/donate)
+## [如何给项目提交PR](https://github.com/liudf0716/apfree_wifidog/blob/master/doc/%E5%A6%82%E4%BD%95%E7%BB%99%E9%A1%B9%E7%9B%AE%E6%8F%90%E4%BA%A4PR.md)
 
 
 ---
+
+## 感谢如下开源项目提供的思路和帮助：
+
+- https://github.com/wifidog/wifidog-gateway  
+
+- https://github.com/ppelleti/https-example
+
+- https://github.com/sosopop/uvhttp
+
+- http://ezxml.sourceforge.net/
+
+----
+
+## powered by 坤腾畅联固件研发团队 （ www.kunteng.org ）
+## 加qq群讨论： [331230369](https://jq.qq.com/?_wv=1027&k=4ADDSev)
+
+
+## 如果该项目对您有帮助，请毫不犹豫点star，谢谢！
