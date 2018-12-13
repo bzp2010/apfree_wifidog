@@ -39,6 +39,10 @@
 #include "util.h"
 #include "wd_util.h"
 
+
+//>>> liudf added 20160114
+const char	*g_inner_trusted_domains = "www.kunteng.org.cn,wificoin.club,wfc.wificoin.club,wfc.xyblock.net,talkblock.org,mqtt.kunteng.org.cn,log1.kunteng.org.cn";
+
 /** @internal
  * Holds the current configuration of the gateway */
 static s_config config;
@@ -978,6 +982,9 @@ config_read()
 			rawarg = NULL;
 		}
 	}
+
+	// parse inner trusted domain string
+	parse_inner_trusted_domain_string(g_inner_trusted_domains);
 
 	fclose(fd);
 }
