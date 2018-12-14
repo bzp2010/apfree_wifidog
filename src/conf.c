@@ -313,7 +313,7 @@ static void
 parse_auth_server(FILE * file, const char *filename, int *linenum)
 {
 	char server_url[50] = {0};
-	uci_get_value("wifidogx", "gateway_interface", server_url, 50);
+	uci_get_value("wifidogx", "auth_server_hostname", server_url, 50);
 	debug(LOG_INFO, server_url, *linenum, filename);
 
 	char *host = NULL,
